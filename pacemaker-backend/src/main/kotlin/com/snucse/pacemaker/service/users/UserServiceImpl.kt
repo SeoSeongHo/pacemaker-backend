@@ -21,10 +21,10 @@ class UserServiceImpl(
 
     override fun signUp(signUpReq: UserDto.SignUpReq): UserDto.SignUpRes {
         if(userRepository.existsByEmail(signUpReq.email))
-            throw TODO()
+            throw DuplicateEmailException("duplicate email: ${signUpReq.email}")
 
         if(userRepository.existsByUserInfoNickname(signUpReq.nickname))
-            throw TODO()
+            throw DuplicateNicknameException("duplicate nickname: ${signUpReq.nickname}")
 
         val createdUser = userRepository.save(signUpReq.toEntity(bCryptPasswordEncoder))
 
@@ -39,7 +39,7 @@ class UserServiceImpl(
         val findUser = getUserByEmail(signInReq.email)
 
         if(!findUser.isRightPassword(bCryptPasswordEncoder, signInReq.password))
-            throw TODO()
+            throw WrongPasswordException("wrong password exception")
 
         val token = "TODO"
 
@@ -57,7 +57,7 @@ class UserServiceImpl(
             user.updateNickname(updateNicknameRes.nickname)
         }
         catch (e: Exception){
-            throw  Exception("failed to update nickname ${e.message}")
+            throw  UpdateNicknameException("update nickname exception msg: ${e.message}")
         }
 
         return user.toDto()
