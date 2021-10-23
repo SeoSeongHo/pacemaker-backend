@@ -8,10 +8,10 @@ interface UserService {
     fun getUserByEmail(email: String): User
 
     fun signUp(signUpReq: UserDto.SignUpReq): UserDto.SignUpRes
-    fun signIn(signInReq: UserDto.SignInReq): UserDto.SignInReq
-//    fun logout()
-//
-//    fun updateUserInfo()
+    fun signIn(signInReq: UserDto.SignInReq): UserDto.SignInRes
+    fun signOut()
 
-    fun isDuplicateEmail(email: String): Boolean
+    fun updateNickname(updateNicknameRes: UserDto.updateNicknameRes, userId: Long): UserDto.UserRes
+
+//    fun isDuplicateEmail(email: String): Boolean
 }

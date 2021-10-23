@@ -5,17 +5,18 @@ import com.snucse.pacemaker.dto.UserDto
 import com.snucse.pacemaker.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import com.snucse.pacemaker.exception.*
 
 class UserServiceImpl(
         @Autowired private val userRepository: UserRepository,
         @Autowired private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ): UserService {
     override fun getUserById(id: Long): User =
-            userRepository.findById(id).orElseThrow(throw TODO())
+            userRepository.findById(id).orElseThrow { throw UserNotFoundException("can't find user by id: $id.")}
 
 
     override fun getUserByEmail(email: String): User =
-            userRepository.findByEmail(email) ?: throw TODO()
+            userRepository.findByEmail(email) ?: throw UserNotFoundException("can't find user by email: $email")
 
 
     override fun signUp(signUpReq: UserDto.SignUpReq): UserDto.SignUpRes {
@@ -34,13 +35,33 @@ class UserServiceImpl(
     }
 
 
-    override fun signIn(signInReq: UserDto.SignInReq): UserDto.SignInReq {
-        TODO("Not yet implemented")
+    override fun signIn(signInReq: UserDto.SignInReq): UserDto.SignInRes {
+        val findUser = getUserByEmail(signInReq.email)
+
+        if(!findUser.isRightPassword(bCryptPasswordEncoder, signInReq.password))
+            throw TODO()
+
+        val token = "TODO"
+
+        return UserDto.SignInRes.toDto(token, findUser)
     }
 
-
-    override fun isDuplicateEmail(email: String): Boolean {
-        TODO("Not yet implemented")
+    override fun signOut() {
+        TODO()
     }
+
+    override fun updateNickname(updateNicknameRes: UserDto.updateNicknameRes, userId: Long): UserDto.UserRes {
+        val user = getUserById(userId)
+
+        try{
+            user.updateNickname(updateNicknameRes.nickname)
+        }
+        catch (e: Exception){
+            throw  Exception("failed to update nickname ${e.message}")
+        }
+
+        return user.toDto()
+    }
+
 
 }
