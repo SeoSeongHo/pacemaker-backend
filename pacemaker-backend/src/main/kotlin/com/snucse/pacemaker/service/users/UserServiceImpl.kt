@@ -6,7 +6,11 @@ import com.snucse.pacemaker.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import com.snucse.pacemaker.exception.*
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+@Service
+@Transactional
 class UserServiceImpl(
         @Autowired private val userRepository: UserRepository,
         @Autowired private val bCryptPasswordEncoder: BCryptPasswordEncoder
@@ -28,7 +32,7 @@ class UserServiceImpl(
 
         val createdUser = userRepository.save(signUpReq.toEntity(bCryptPasswordEncoder))
 
-        val token = "TODO"
+        val token = TODO("Generate tocken")
 
         return UserDto.SignUpRes.toDto(token, createdUser)
 
@@ -41,7 +45,7 @@ class UserServiceImpl(
         if(!findUser.isRightPassword(bCryptPasswordEncoder, signInReq.password))
             throw WrongPasswordException("wrong password exception")
 
-        val token = "TODO"
+        val token = TODO("Generate tocken")
 
         return UserDto.SignInRes.toDto(token, findUser)
     }
