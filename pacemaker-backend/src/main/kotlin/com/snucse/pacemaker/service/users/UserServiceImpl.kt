@@ -1,6 +1,8 @@
 package com.snucse.pacemaker.service.users
 
+import com.snucse.pacemaker.config.jwt.JwtTokenProvider
 import com.snucse.pacemaker.domain.User
+import com.snucse.pacemaker.dto.OAuthDto
 import com.snucse.pacemaker.dto.UserDto
 import com.snucse.pacemaker.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UserServiceImpl(
         @Autowired private val userRepository: UserRepository,
-        @Autowired private val bCryptPasswordEncoder: BCryptPasswordEncoder
+        @Autowired private val bCryptPasswordEncoder: BCryptPasswordEncoder,
+        @Autowired private val jwtTokenProvider: JwtTokenProvider
 ): UserService {
     override fun getUserById(id: Long): User =
             userRepository.findById(id).orElseThrow { throw UserNotFoundException("can't find user by id: $id.")}
@@ -32,7 +35,7 @@ class UserServiceImpl(
 
         val createdUser = userRepository.save(signUpReq.toEntity(bCryptPasswordEncoder))
 
-        val token = TODO("Generate tocken")
+        val token = jwtTokenProvider.createToken(createdUser.id!!)
 
         return UserDto.SignUpRes.toDto(token, createdUser)
 
@@ -45,12 +48,12 @@ class UserServiceImpl(
         if(!findUser.isRightPassword(bCryptPasswordEncoder, signInReq.password))
             throw WrongPasswordException("wrong password exception")
 
-        val token = TODO("Generate tocken")
+        val token = jwtTokenProvider.createToken(findUser.id!!)
 
         return UserDto.SignInRes.toDto(token, findUser)
     }
 
-    override fun signOut() {
+    override fun signOut(oAuthDto: OAuthDto) {
         TODO()
     }
 

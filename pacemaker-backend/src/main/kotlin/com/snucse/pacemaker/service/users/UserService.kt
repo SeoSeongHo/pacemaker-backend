@@ -9,7 +9,7 @@ interface UserService {
 
     fun signUp(signUpReq: UserDto.SignUpReq): UserDto.SignUpRes
     fun signIn(signInReq: UserDto.SignInReq): UserDto.SignInRes
-    fun signOut()
+    fun signOut(oAuthDto: OAuthDto)
 
     fun updateNickname(updateNicknameRes: UserDto.updateNicknameRes, userId: Long): UserDto.UserRes
 

@@ -1,11 +1,14 @@
 package com.snucse.pacemaker.controller
 
+import com.snucse.pacemaker.dto.AuthPrincipal
+import com.snucse.pacemaker.dto.OAuthDto
 import com.snucse.pacemaker.dto.UserDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.snucse.pacemaker.service.users.UserService
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import javax.validation.Valid
 
 @RestController
@@ -33,12 +36,17 @@ class UsersController (
     }
 
     @PostMapping("/signout")
-    fun signOut() {
-        TODO()
+    fun signOut(@RequestBody oAuthDto: OAuthDto) {
+        userService.signOut(oAuthDto)
     }
 
     @PostMapping("/updatenickname")
-    fun updateNickname() {
-        TODO()
+    fun updateNickname(@AuthenticationPrincipal authPrincipal: AuthPrincipal, @RequestBody updateNicknameRes: UserDto.updateNicknameRes)
+    : ResponseEntity<UserDto.UserRes> {
+
+        val updatedUser = userService.updateNickname(updateNicknameRes, authPrincipal.userId)
+        return ResponseEntity
+                .ok()
+                .body(updatedUser)
     }
 }
