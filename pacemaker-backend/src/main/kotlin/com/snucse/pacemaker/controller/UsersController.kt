@@ -36,8 +36,8 @@ class UsersController (
     }
 
     @PostMapping("/signout")
-    fun signOut(@RequestBody oAuthDto: OAuthDto) {
-        userService.signOut(oAuthDto)
+    fun signOut(@RequestBody oAuthReq: OAuthDto.OAuthReq) {
+        userService.signOut(oAuthReq)
     }
 
     @PostMapping("/updatenickname")

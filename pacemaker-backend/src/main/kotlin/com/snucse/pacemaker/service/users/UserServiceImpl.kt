@@ -1,6 +1,7 @@
 package com.snucse.pacemaker.service.users
 
 import com.snucse.pacemaker.config.jwt.JwtTokenProvider
+import com.snucse.pacemaker.domain.BlackList
 import com.snucse.pacemaker.domain.User
 import com.snucse.pacemaker.dto.OAuthDto
 import com.snucse.pacemaker.dto.UserDto
@@ -8,6 +9,7 @@ import com.snucse.pacemaker.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import com.snucse.pacemaker.exception.*
+import com.snucse.pacemaker.repository.BlackListRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional
 class UserServiceImpl(
         @Autowired private val userRepository: UserRepository,
         @Autowired private val bCryptPasswordEncoder: BCryptPasswordEncoder,
-        @Autowired private val jwtTokenProvider: JwtTokenProvider
+        @Autowired private val jwtTokenProvider: JwtTokenProvider,
+        @Autowired private val blackListRepository: BlackListRepository
 ): UserService {
     override fun getUserById(id: Long): User =
             userRepository.findById(id).orElseThrow { throw UserNotFoundException("can't find user by id: $id.")}
@@ -53,8 +56,8 @@ class UserServiceImpl(
         return UserDto.SignInRes.toDto(token, findUser)
     }
 
-    override fun signOut(oAuthDto: OAuthDto) {
-        TODO()
+    override fun signOut(oAuthDto: OAuthDto.OAuthReq) {
+        blackListRepository.save(BlackList(token = oAuthDto.token))
     }
 
     override fun updateNickname(updateNicknameRes: UserDto.updateNicknameRes, userId: Long): UserDto.UserRes {
