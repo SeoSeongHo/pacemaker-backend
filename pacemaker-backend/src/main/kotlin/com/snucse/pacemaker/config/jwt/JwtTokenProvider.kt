@@ -2,9 +2,11 @@ package com.snucse.pacemaker.config.jwt
 
 import com.snucse.pacemaker.dto.AuthPrincipal
 import com.snucse.pacemaker.exception.JwtValidationException
+import com.snucse.pacemaker.repository.BlackListRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -15,7 +17,8 @@ import javax.servlet.http.HttpServletRequest
 @Component
 class JwtTokenProvider(
         @Value("\${jwt.secret_key}") private val jwtSecretKey: String,
-        @Value("\${jwt.secret_key}") private val jwtTTL: Long
+        @Value("\${jwt.secret_key}") private val jwtTTL: Long,
+        @Autowired private val blackListRepository: BlackListRepository
 ) {
 
     fun createToken(userId: Long): String{
@@ -42,6 +45,7 @@ class JwtTokenProvider(
     }
 
     fun validateToken(token: String): Boolean{
+        if(blackListRepository.existsByToken(token)) throw JwtValidationException("jwt is in black list. please reissued.")
         try{
             if(getClaims(token).expiration.before(Date())) return false
             return true
