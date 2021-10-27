@@ -49,4 +49,11 @@ class UsersController (
                 .ok()
                 .body(updatedUser)
     }
+
+    @GetMapping("/test")
+    fun test(): ResponseEntity<String> {
+        return ResponseEntity
+                .ok()
+                .body("sucess")
+    }
 }

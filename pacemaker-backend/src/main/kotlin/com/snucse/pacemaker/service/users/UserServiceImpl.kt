@@ -33,7 +33,7 @@ class UserServiceImpl(
         if(userRepository.existsByEmail(signUpReq.email))
             throw DuplicateEmailException("duplicate email: ${signUpReq.email}")
 
-        if(userRepository.existsByUserInfoNickname(signUpReq.nickname))
+        if(userRepository.existsByNickname(signUpReq.nickname))
             throw DuplicateNicknameException("duplicate nickname: ${signUpReq.nickname}")
 
         val createdUser = userRepository.save(signUpReq.toEntity(bCryptPasswordEncoder))

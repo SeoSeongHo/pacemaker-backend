@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest
 @Component
 class JwtTokenProvider(
         @Value("\${jwt.secret_key}") private val jwtSecretKey: String,
-        @Value("\${jwt.secret_key}") private val jwtTTL: Long,
+        @Value("\${jwt.expire_time}") private val jwtTTL: Long,
         @Autowired private val blackListRepository: BlackListRepository
 ) {
 
