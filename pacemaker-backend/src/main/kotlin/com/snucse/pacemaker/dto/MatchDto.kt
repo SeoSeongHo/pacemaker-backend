@@ -11,17 +11,8 @@ class MatchDto {
 
     data class InMatchRes(
             val matchUsers: MutableList<MatchUser>,
-            val alarmCategory: String
-    ){
-        companion object{
-            fun toDto(): InMatchRes {
-                return InMatchRes(
-                        matchUsers = mutableListOf<MatchUser>(),
-                        alarmCategory = "test"
-                )
-            }
-        }
-    }
+            var alarmCategory: String
+    )
 
     data class MatchUser(
             val email: String,

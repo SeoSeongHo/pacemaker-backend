@@ -13,6 +13,7 @@ data class Match(
 
         var matchStartDatetime: LocalDateTime,
         var matchEndDatetime: LocalDateTime,
+        var distance: Long
 ) {
 }
 
@@ -29,7 +30,19 @@ data class UserMatch(
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "match_id")
-        var match: Match
+        var match: Match,
+
+        @OneToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "userHistory_id")
+        var userHistory: UserHistory,
+
+        var distance: Long,
+        var speed: Long,
+
+        var left100: Boolean = false,
+        var left50: Boolean = false,
+        var finish: Boolean = false,
+        var finishOther: Boolean = false,
 ){
 
 }

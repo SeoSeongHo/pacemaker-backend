@@ -56,7 +56,7 @@ data class UserHistory(
         var rank: Long,
         var totalMembers: Long,
 
-        var maximumVelocity: Long,
+        var maximumVelocity: Long = 0,
 
         // distance list
         var graph: ArrayList<Long> = arrayListOf<Long>()
