@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface UserMatchRepository: JpaRepository<UserMatch, Long> {
 
     fun existsByUser_Id(userId: Long): Boolean
-    fun findByUser_Id(userId: Long): UserMatch?
+    fun findByUser_Id(userId: Long): List<UserMatch>?
 }
