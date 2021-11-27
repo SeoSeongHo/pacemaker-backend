@@ -12,6 +12,7 @@ data class Match(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null,
 
+        var distance: Long
         var matchStartDatetime: LocalDateTime? = null,
         var matchEndDatetime: LocalDateTime? = null
 )
@@ -29,7 +30,19 @@ data class UserMatch(
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "match_id")
-        var match: Match
+        var match: Match,
+
+        @OneToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "userHistory_id")
+        var userHistory: UserHistory,
+
+        var distance: Long,
+        var speed: Long,
+
+        var left100: Boolean = false,
+        var left50: Boolean = false,
+        var finish: Boolean = false,
+        var finishOther: Boolean = false,
 )
 
 enum class MatchStatus{
