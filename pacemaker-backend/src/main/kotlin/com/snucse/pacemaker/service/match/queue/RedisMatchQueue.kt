@@ -8,18 +8,43 @@ class RedisMatchQueue {
 
     companion object{
 
-        var matchQueue: Queue<Long> = LinkedList<Long>()
+        var matchQueues = mutableMapOf<String, Queue<Long>>()
 
-        fun add(userId: Long){
-            matchQueue.add(userId)
+        fun add(category: String, userId: Long){
+            if(!isExistUser(category, userId)){
+                if(matchQueues[category] != null){
+                    matchQueues[category]!!.add(userId)
+                }
+                else{
+                    matchQueues[category] = LinkedList(listOf(userId))
+                }
+            }
         }
 
-        fun poll(): Long{
-            return matchQueue.poll()
+        // retrieves and remove
+        fun poll(category: String): Long?{
+            return if(matchQueues[category] == null){
+                null
+            } else{
+                matchQueues[category]!!.poll()
+            }
         }
 
-        fun peek(userId: Long){
-            matchQueue.peek()
+        // just retrieves
+        fun peek(category: String): Long?{
+            return if(matchQueues[category] == null){
+                null
+            } else{
+                matchQueues[category]!!.peek()
+            }
+        }
+
+        fun isExistUser(category: String, userId: Long): Boolean{
+            if(matchQueues[category] != null){
+                return matchQueues[category]!!.contains(userId)
+            }
+
+            return false
         }
     }
 }
