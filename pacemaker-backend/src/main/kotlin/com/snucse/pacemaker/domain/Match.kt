@@ -1,5 +1,6 @@
 package com.snucse.pacemaker.domain
 
+import com.snucse.pacemaker.dto.MatchDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -11,11 +12,10 @@ data class Match(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null,
 
-        var matchStartDatetime: LocalDateTime,
-        var matchEndDatetime: LocalDateTime,
         var distance: Long
-) {
-}
+        var matchStartDatetime: LocalDateTime? = null,
+        var matchEndDatetime: LocalDateTime? = null
+)
 
 @Entity
 @Table(name = "match_user")
@@ -43,6 +43,8 @@ data class UserMatch(
         var left50: Boolean = false,
         var finish: Boolean = false,
         var finishOther: Boolean = false,
-){
+)
 
+enum class MatchStatus{
+        PENDING, DONE, ERROR
 }
