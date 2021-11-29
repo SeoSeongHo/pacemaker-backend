@@ -39,46 +39,7 @@ data class User (
         }
 }
 
-@Entity
-@Table(name = "userHistory")
-data class UserHistory(
-        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id: Long? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "user_id")
-        var user: User,
-
-        var distance: Long,
-        var matchStartDatetime: LocalDateTime,
-        var matchEndDatetime: LocalDateTime,
-
-        var rank: Long,
-        var totalMembers: Long,
-
-        var maximumVelocity: Long = 0,
-
-        // distance list
-        var graph: ArrayList<Long> = arrayListOf<Long>()
-
-) {
-        fun toDto(): UserDto.UserHistory {
-                return UserDto.UserHistory(
-                        id = id!!,
-                        distance = distance,
-
-                        matchStartDatetime = matchStartDatetime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss")),
-                        matchEndDatetime = matchEndDatetime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss")),
-                        time = Duration.between(matchStartDatetime, matchEndDatetime).seconds,
-
-                        rank = rank,
-                        totalMembers = totalMembers,
-
-                        maximumVelocity = maximumVelocity,
-                        graph = graph
-                )
-        }
-}
 
 //@Embeddable
 //data class UserInfo(

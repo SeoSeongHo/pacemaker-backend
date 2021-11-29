@@ -72,10 +72,10 @@ class UserDto {
 
     data class UserHistory(
             var id: Long,
-            var distance: Long,
+            var totalDistance: Long,
             var matchStartDatetime: String,
             var matchEndDatetime: String,
-            var time: Long,
+            var totalTime: Long,
 
             var rank: Long,
             var totalMembers: Long,
