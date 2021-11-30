@@ -66,7 +66,7 @@ data class UserMatch(
                         rank = rank,
                         totalMembers = match.totalMembers,
 
-                        maximumVelocity = maximumSpeed,
+                        maximumSpeed = maximumSpeed,
                         graph = graph
                 )
         }

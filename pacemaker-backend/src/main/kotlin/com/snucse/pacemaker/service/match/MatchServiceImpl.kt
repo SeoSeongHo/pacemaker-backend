@@ -101,12 +101,12 @@ class MatchServiceImpl(
 
         if(userMatch.match.totalDistance - inMatchReq.currentDistance <= 100 && !userMatch.left100){
             userMatch.left100 = true
-            inMatchRes.alarmCategory = "100M_LEFT"
+            inMatchRes.alarmCategory = "LEFT_100M"
         }
 
         if(userMatch.match.totalDistance - inMatchReq.currentDistance <= 50 && !userMatch.left50){
             userMatch.left50 = true
-            inMatchRes.alarmCategory = "50M_LEFT"
+            inMatchRes.alarmCategory = "LEFT_50M"
         }
 
         if(userMatch.match.totalDistance - inMatchReq.currentDistance <= 0 && !userMatch.finish){

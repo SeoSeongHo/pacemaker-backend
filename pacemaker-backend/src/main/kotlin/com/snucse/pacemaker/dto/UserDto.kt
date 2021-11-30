@@ -80,7 +80,7 @@ class UserDto {
             var rank: Long,
             var totalMembers: Long,
 
-            var maximumVelocity: Long,
+            var maximumSpeed: Long,
             var graph: ArrayList<Long>
     )
 
