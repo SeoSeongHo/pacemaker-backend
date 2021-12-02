@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.persistence.*
+import kotlin.collections.ArrayList
 
 @Entity
 @Table(name = "match")
@@ -43,7 +44,8 @@ data class UserMatch(
 
         var rank: Long = 0,
         var maximumSpeed: Long = 0,
-        var graph: ArrayList<Long> = arrayListOf<Long>(),
+
+        var graph: String = "0",
 
         var left100: Boolean = false,
         var left50: Boolean = false,
@@ -69,9 +71,19 @@ data class UserMatch(
                         totalMembers = match.totalMembers,
 
                         maximumSpeed = maximumSpeed,
-                        graph = graph
+                        graph = getGraph()
                 )
         }
+
+        fun getGraph(): ArrayList<Long> {
+                val g = arrayListOf<Long>();
+                graph.split(";").forEach {
+                        g.add(it.toLong())
+                }
+                return g
+        }
+
+
 }
 
 enum class MatchStatus{
