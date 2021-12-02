@@ -22,22 +22,29 @@ import javax.validation.constraints.Null
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 @Transactional
 class MatchServiceImpl(
         @Autowired private val userMatchRepository: UserMatchRepository,
+        @Autowired private val matchRepository: MatchRepository
 ): MatchService {
 
     override fun match(matchReq: MatchDto.MatchReq, userId: Long): MatchDto.MatchRes {
 
         val category = "${matchReq.distance}_${matchReq.participants}"
 
+        var now = LocalDateTime.now().plusSeconds(5)
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        var text = formatter.format(now)
+
         // If it already exists in the match queue
         if(RedisMatchQueue.isExistUser(category, userId)){
 
             // If it exists in the match DB
             if(userMatchRepository.existsByUser_Id(userId)){
+                // TODO 중복제거
                 val userMatches = userMatchRepository.findByUser_Id(userId)
                 val users = mutableListOf<User>()
                 if(userMatches != null
@@ -49,7 +56,7 @@ class MatchServiceImpl(
 
                 return MatchDto.MatchRes(
                         status = MatchStatus.DONE,
-                        startDatetime = LocalDateTime.now(),
+                        startDatetime = LocalDateTime.parse(text, formatter),
                         users = users.map { user -> user.toDto() }
                 )
             }
@@ -60,10 +67,14 @@ class MatchServiceImpl(
 
         return MatchDto.MatchRes(
                 status = MatchStatus.PENDING,
-                startDatetime = LocalDateTime.now(),
+                startDatetime = LocalDateTime.parse(text, formatter),
                 users = mutableListOf()
         )
     }
+/*
+    override fun inMatchPolling(matchId: Long, inMatchReq: MatchDto.InMatchReq): MatchDto.InMatchRes {
+
+        val match = matchRepository.findById(matchId).orElseThrow()
 
     override fun getUserMatchByUserMatchId(userMatchId: Long): UserMatch =
             userMatchRepository.findById(userMatchId).orElseThrow { throw UserMatchNotExistException("can't find userMatch by id: $userMatchId.") }
@@ -172,5 +183,5 @@ class MatchServiceImpl(
 
 
         return inMatchRes
-    }
+    }*/
 }
