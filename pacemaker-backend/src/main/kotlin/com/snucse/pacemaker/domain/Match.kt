@@ -18,7 +18,9 @@ data class Match(
         var totalDistance: Long = 0,
         var totalMembers: Long = 0,
         var matchStartDatetime: LocalDateTime? = null,
-        var matchEndDatetime: LocalDateTime? = null
+        var matchEndDatetime: LocalDateTime? = null,
+        @Enumerated(EnumType.STRING)
+        var matchStatus: MatchStatus? = MatchStatus.NONE,
 )
 
 @Entity
@@ -73,5 +75,5 @@ data class UserMatch(
 }
 
 enum class MatchStatus{
-        PENDING, DONE, ERROR
+        NONE, MATCHING, MATCHING_COMPLETE, RUNNING, RUNNING_COMPLETE, ERROR
 }

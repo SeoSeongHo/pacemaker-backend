@@ -17,12 +17,16 @@ class MatchController(
         @Autowired private val matchQueueConsumer: MatchQueueConsumer
 ) {
 
+    private var startFlag: Boolean = true
+
     @PostMapping
     fun match(@AuthenticationPrincipal authPrincipal: AuthPrincipal, @RequestBody matchReq: MatchDto.MatchReq)
     : ResponseEntity<MatchDto.MatchRes> {
 
-        // TODO 따로 컨슘 메서드 구현
-        matchQueueConsumer.consume()
+        if(startFlag){
+            matchQueueConsumer.consume()
+            startFlag = false
+        }
 
         val matchRes = matchService.match(matchReq, authPrincipal.userId)
 
@@ -31,7 +35,7 @@ class MatchController(
                     .body(matchRes)
     }
 
-    @PostMapping("/inMatchPolling")
+    @PostMapping("/poll")
     fun inMatchPolling(@RequestBody inMatchReq: MatchDto.InMatchReq): ResponseEntity<MatchDto.InMatchRes> {
         val inMatchRes = matchService.inMatchPolling(inMatchReq)
 

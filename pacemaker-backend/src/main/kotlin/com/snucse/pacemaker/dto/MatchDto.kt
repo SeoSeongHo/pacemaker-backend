@@ -22,7 +22,7 @@ class MatchDto {
             @Enumerated(EnumType.STRING)
             var status: MatchStatus,
             var startDatetime: LocalDateTime,
-            var users: List<UserDto.UserRes>?
+            var users: List<MatchUser>?
     )
     
     data class InMatchReq(
@@ -37,9 +37,10 @@ class MatchDto {
     )
 
     data class MatchUser(
+            val id: Long,
             val email: String,
             val nickname: String,
-            val currentDistance: Long,
-            val currentSpeed: Long
+            val currentDistance: Long? = 0,
+            val currentSpeed: Long? = 0
     )
 }
