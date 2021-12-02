@@ -20,7 +20,7 @@ data class Match(
         var matchStartDatetime: LocalDateTime? = null,
         var matchEndDatetime: LocalDateTime? = null,
         @Enumerated(EnumType.STRING)
-        var matchStatus: MatchStatus? = MatchStatus.NONE,
+        var matchStatus: MatchStatus? = MatchStatus.MATCHING,
 )
 
 @Entity
@@ -75,5 +75,5 @@ data class UserMatch(
 }
 
 enum class MatchStatus{
-        NONE, MATCHING, MATCHING_COMPLETE, RUNNING, RUNNING_COMPLETE, ERROR
+        MATCHING, MATCHING_COMPLETE, DONE, ERROR
 }

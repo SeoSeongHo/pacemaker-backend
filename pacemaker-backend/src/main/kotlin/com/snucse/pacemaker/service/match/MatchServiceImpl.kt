@@ -1,24 +1,14 @@
 package com.snucse.pacemaker.service.match
 
-import com.snucse.pacemaker.domain.Match
-
 import com.snucse.pacemaker.domain.MatchStatus
 import com.snucse.pacemaker.domain.User
 import com.snucse.pacemaker.domain.UserMatch
 import com.snucse.pacemaker.dto.MatchDto
-import com.snucse.pacemaker.dto.UserDto
-
-import com.snucse.pacemaker.exception.MatchingProcessingYetException
 import com.snucse.pacemaker.exception.UserMatchNotExistException
-import com.snucse.pacemaker.exception.UserNotFoundException
 import com.snucse.pacemaker.repository.MatchRepository
 import com.snucse.pacemaker.repository.UserMatchRepository
 import com.snucse.pacemaker.service.match.queue.RedisMatchQueue
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.cache.CacheProperties
-
-import javax.validation.constraints.Null
-
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -30,6 +20,13 @@ class MatchServiceImpl(
         @Autowired private val userMatchRepository: UserMatchRepository,
         @Autowired private val matchRepository: MatchRepository
 ): MatchService {
+
+    override fun cancelMatch(category: String, userId: Long){
+        // If it already exists in the match queue
+        if(RedisMatchQueue.isExistUser(category, userId)){
+            RedisMatchQueue.remove(category, userId)
+        }
+    }
 
     override fun match(matchReq: MatchDto.MatchReq, userId: Long): MatchDto.MatchRes {
 
@@ -53,29 +50,47 @@ class MatchServiceImpl(
                 val realUserMatches = userMatchRepository.findAllByMatch_Id(match.id!!)
                 if(realUserMatches.isNotEmpty()){
 
-                    realUserMatches.map { realUserMatch -> realUserMatch.match.matchStatus == MatchStatus.RUNNING }
+                    realUserMatches.map { realUserMatch -> realUserMatch.match.matchStatus == MatchStatus.MATCHING_COMPLETE }
                 }
 
                 userMatchRepository.saveAll(realUserMatches)
 
                 val users = mutableListOf<User>()
+                var matchUsers = mutableListOf<MatchDto.MatchUser>()
                 if(realUserMatches.isNotEmpty()){
                     realUserMatches.forEach { userMatch ->
+                        matchUsers.add(MatchDto.MatchUser(
+                                id = userMatch.user.id!!,
+                                userMatchId = userMatch.id!!,
+                                email = userMatch.user.email,
+                                nickname = userMatch.user.nickname,
+                                currentDistance = userMatch.currentDistance,
+                                currentSpeed = userMatch.currentSpeed
+                        ))
                         users.add(userMatch.user)
                     }
                 }
 
-                val mainUser = users.filter { user -> user.id == userId }
-                users.add(0, mainUser[0])
-                users.toList().sortedBy { user -> user.id }
+                val mainMatchUser = matchUsers.filter { matchUser -> matchUser.id == userId }
+                matchUsers = matchUsers.filter { matchUser -> matchUser.id != userId }.toMutableList()
+                matchUsers.sortBy { matchUser -> matchUser.id }
+                matchUsers.add(0, mainMatchUser[0])
+
+//                val mainUser = users.filter { user -> user.id == userId }
+//                users = users.filter { user -> user.id != userId }.toMutableList()
+//                users.add(0, mainUser[0])
+//                users.toList().sortedBy { user -> user.id }
+
+
+//                users.map { user -> MatchDto.MatchUser(
+//                        id = user.id!!,
+//                        email =  user.email,
+//                        nickname = user.nickname)
 
                 return MatchDto.MatchRes(
-                        status = MatchStatus.RUNNING,
-                        startDatetime = LocalDateTime.parse(text, formatter),
-                        users = users.map { user -> MatchDto.MatchUser(
-                                id = user.id!!,
-                                email =  user.email,
-                                nickname = user.nickname) }
+                        status = MatchStatus.MATCHING_COMPLETE,
+                        startDatetime = match.matchStartDatetime!!,
+                        users = matchUsers
                 )
             }
         }
@@ -116,15 +131,24 @@ class MatchServiceImpl(
         )
 
         userMatch.id?.let { userMatchRepository.findAllByMatch_Id(it).forEach { otherUserMatch ->
-            if(otherUserMatch.id != userMatch.id){
-                inMatchRes.matchUsers.add(MatchDto.MatchUser(
-                        id = otherUserMatch.user.id!!,
-                        email =  otherUserMatch.user.email,
-                        nickname = otherUserMatch.user.nickname,
-                        currentDistance = otherUserMatch.currentDistance,
-                        currentSpeed = otherUserMatch.currentSpeed
-                ))
-            }
+//            if(otherUserMatch.id != userMatch.id){
+//                inMatchRes.matchUsers.add(MatchDto.MatchUser(
+//                        id = otherUserMatch.user.id!!,
+//                        email =  otherUserMatch.user.email,
+//                        nickname = otherUserMatch.user.nickname,
+//                        currentDistance = otherUserMatch.currentDistance,
+//                        currentSpeed = otherUserMatch.currentSpeed,
+//                        userMatchId = otherUserMatch.id!!
+//                ))
+//            }
+            inMatchRes.matchUsers.add(MatchDto.MatchUser(
+                    id = otherUserMatch.user.id!!,
+                    email =  otherUserMatch.user.email,
+                    nickname = otherUserMatch.user.nickname,
+                    currentDistance = otherUserMatch.currentDistance,
+                    currentSpeed = otherUserMatch.currentSpeed,
+                    userMatchId = otherUserMatch.id!!
+            ))
         } }
 
         if(userMatch.match.totalDistance - inMatchReq.currentDistance <= 100 && !userMatch.left100){
@@ -196,7 +220,7 @@ class MatchServiceImpl(
         if(done){
             inMatchRes.alarmCategory = "DONE"
             val match = userMatch.match
-            match.matchStatus = MatchStatus.RUNNING_COMPLETE
+            match.matchStatus = MatchStatus.DONE
             matchRepository.save(match)
         }
 

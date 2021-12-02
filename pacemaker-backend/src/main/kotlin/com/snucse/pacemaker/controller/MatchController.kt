@@ -44,6 +44,11 @@ class MatchController(
                 .body(inMatchRes)
     }
 
+    @PostMapping("/cancel")
+    fun cancelMatch(@AuthenticationPrincipal authPrincipal: AuthPrincipal){
+
+    }
+
     @GetMapping
     fun test(){
 
