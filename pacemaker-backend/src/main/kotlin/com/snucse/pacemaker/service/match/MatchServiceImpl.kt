@@ -1,23 +1,15 @@
 package com.snucse.pacemaker.service.match
 
-import com.snucse.pacemaker.domain.Match
-
 import com.snucse.pacemaker.domain.MatchStatus
 import com.snucse.pacemaker.domain.User
 import com.snucse.pacemaker.domain.UserMatch
 import com.snucse.pacemaker.dto.MatchDto
-import com.snucse.pacemaker.dto.UserDto
 
-import com.snucse.pacemaker.exception.MatchingProcessingYetException
 import com.snucse.pacemaker.exception.UserMatchNotExistException
-import com.snucse.pacemaker.exception.UserNotFoundException
 import com.snucse.pacemaker.repository.MatchRepository
 import com.snucse.pacemaker.repository.UserMatchRepository
 import com.snucse.pacemaker.service.match.queue.RedisMatchQueue
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.cache.CacheProperties
-
-import javax.validation.constraints.Null
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -100,7 +92,7 @@ class MatchServiceImpl(
         val userMatch = getUserMatchByUserMatchId(inMatchReq.userMatchId)
 
         // distance update
-        userMatch.graph.add(inMatchReq.currentDistance)
+        userMatch.graph += ";" + inMatchReq.currentDistance.toString()
         userMatch.currentDistance = inMatchReq.currentDistance
 
         // speed update
@@ -164,19 +156,21 @@ class MatchServiceImpl(
 
 
         // Overtaken, Overtaking
-        if(userMatch.graph.size >= 10){
+        val userGraph = userMatch.getGraph()
+        if(userGraph.size >= 10){
             userMatch.id?.let { userMatchRepository.findAllByMatch_Id(it).forEach { otherUserMatch ->
-                if(otherUserMatch.id != userMatch.id && otherUserMatch.graph.size >= 10){
-                    val userGraphSize = userMatch.graph.size
-                    val otherUserGraphSize = otherUserMatch.graph.size
+                val otherUserGraph = otherUserMatch.getGraph()
+                if(otherUserMatch.id != userMatch.id && otherUserGraph.size >= 10){
+                    val userGraphSize = userGraph.size
+                    val otherUserGraphSize = otherUserGraph.size
 
-                    if(userMatch.graph[userGraphSize-2] < otherUserMatch.graph[otherUserGraphSize-2]){
-                        if(userMatch.graph[userGraphSize-1] > otherUserMatch.graph[otherUserGraphSize-1]){
+                    if(userGraph[userGraphSize-2] < otherUserGraph[otherUserGraphSize-2]){
+                        if(userGraph[userGraphSize-1] > otherUserGraph[otherUserGraphSize-1]){
                             inMatchRes.alarmCategory = "OVERTAKING"
                         }
                     }
-                    else if(userMatch.graph[userGraphSize-2] > otherUserMatch.graph[otherUserGraphSize-2]){
-                        if(userMatch.graph[userGraphSize-1] < otherUserMatch.graph[otherUserGraphSize-1]){
+                    else if(userGraph[userGraphSize-2] > otherUserGraph[otherUserGraphSize-2]){
+                        if(userGraph[userGraphSize-1] < otherUserGraph[otherUserGraphSize-1]){
                             inMatchRes.alarmCategory = "OVERTAKEN"
                         }
                     }

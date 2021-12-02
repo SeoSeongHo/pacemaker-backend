@@ -81,7 +81,7 @@ class UserDto {
             var totalMembers: Long,
 
             var maximumSpeed: Long,
-            var graph: ArrayList<Long>
+            var graph: List<Long>
     )
 
 }
