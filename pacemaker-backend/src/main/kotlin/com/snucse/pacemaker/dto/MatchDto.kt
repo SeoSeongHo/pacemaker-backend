@@ -38,6 +38,7 @@ class MatchDto {
 
     data class MatchUser(
             val id: Long,
+            val userMatchId: Long,
             val email: String,
             val nickname: String,
             val currentDistance: Long? = 0,

@@ -39,6 +39,12 @@ class RedisMatchQueue {
             }
         }
 
+        fun remove(category: String, userId: Long){
+            if(matchQueues[category] != null){
+                matchQueues[category]!!.remove(userId)
+            }
+        }
+
         fun isExistUser(category: String, userId: Long): Boolean{
             if(matchQueues[category] != null){
                 return matchQueues[category]!!.contains(userId)

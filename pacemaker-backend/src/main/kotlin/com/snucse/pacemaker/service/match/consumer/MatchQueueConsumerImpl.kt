@@ -1,6 +1,7 @@
 package com.snucse.pacemaker.service.match.consumer
 
 import com.snucse.pacemaker.domain.Match
+import com.snucse.pacemaker.domain.MatchStatus
 import com.snucse.pacemaker.domain.User
 import com.snucse.pacemaker.domain.UserMatch
 import com.snucse.pacemaker.repository.MatchRepository
@@ -45,24 +46,27 @@ class MatchQueueConsumerImpl(
         if (RedisMatchQueue.matchQueues[category] != null && RedisMatchQueue.matchQueues[category]!!.size >= participantsNumber)
         {
 
-            val matchUsers = mutableListOf<User>()
+            val users = mutableListOf<User>()
             for(i in 0 until participantsNumber){
                 val user = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
                 if(user != null){
-                    matchUsers.add(user)
+                    users.add(user)
                 }
             }
 
-            val now = LocalDateTime.now().plusSeconds(5)
+            val now = LocalDateTime.now().plusSeconds(15)
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val dateFrom = formatter.format(now)
 
-            val match = Match(matchStartDatetime = LocalDateTime.parse(dateFrom, formatter))
+            val match = Match(
+                    matchStartDatetime = LocalDateTime.parse(dateFrom, formatter),
+                    matchStatus = MatchStatus.MATCHING_COMPLETE
+            )
             val savedMatch = matchRepository.save(match)
 
-            for(matchUser in matchUsers){
+            for(user in users){
                 val userMatch = UserMatch(
-                        user = matchUser,
+                        user = user,
                         match = savedMatch
                 )
                 userMatchRepository.save(userMatch)
