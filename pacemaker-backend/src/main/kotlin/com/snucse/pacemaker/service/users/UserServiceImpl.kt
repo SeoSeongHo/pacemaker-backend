@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import com.snucse.pacemaker.exception.*
 import com.snucse.pacemaker.repository.BlackListRepository
-import com.snucse.pacemaker.repository.UserHistoryRepository
+import com.snucse.pacemaker.repository.UserMatchRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,7 +21,7 @@ class UserServiceImpl(
         @Autowired private val bCryptPasswordEncoder: BCryptPasswordEncoder,
         @Autowired private val jwtTokenProvider: JwtTokenProvider,
         @Autowired private val blackListRepository: BlackListRepository,
-        @Autowired private val userHistoryRepository: UserHistoryRepository
+        @Autowired private val userMatchRepository: UserMatchRepository
 ): UserService {
     override fun getUserById(id: Long): User =
             userRepository.findById(id).orElseThrow { throw UserNotFoundException("can't find user by id: $id.")}
@@ -76,12 +76,14 @@ class UserServiceImpl(
     }
 
     override fun userHistory(userId: Long): UserDto.UserHistoryRes {
-        val userHistories = userHistoryRepository.findAllByUser_Id(userId)
+        val userMatch = userMatchRepository.findByUser_Id(userId)
 
-        val userHistoryRes = UserDto.UserHistoryRes()
+        var userHistoryRes = UserDto.UserHistoryRes()
 
-        userHistories.forEach { history ->
-            userHistoryRes.userHistoryList.add(history.toDto())
+        userMatch?.forEach {
+            userHistoryRes.userHistoryList.add(
+                    it.toDto()
+            )
         }
 
         return userHistoryRes

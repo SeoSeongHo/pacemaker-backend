@@ -19,7 +19,7 @@ class MatchController(
 
     @PostMapping
     fun match(@AuthenticationPrincipal authPrincipal: AuthPrincipal, @RequestBody matchReq: MatchDto.MatchReq)
-    : ResponseEntity<MatchDto.MatchRes>{
+    : ResponseEntity<MatchDto.MatchRes> {
 
         // TODO 따로 컨슘 메서드 구현
         matchQueueConsumer.consume()
@@ -29,6 +29,15 @@ class MatchController(
         return ResponseEntity
                     .ok()
                     .body(matchRes)
+    }
+
+    @PostMapping("/inMatchPolling")
+    fun inMatchPolling(@RequestBody inMatchReq: MatchDto.InMatchReq): ResponseEntity<MatchDto.InMatchRes> {
+        val inMatchRes = matchService.inMatchPolling(inMatchReq)
+
+        return ResponseEntity
+                .ok()
+                .body(inMatchRes)
     }
 
     @GetMapping
