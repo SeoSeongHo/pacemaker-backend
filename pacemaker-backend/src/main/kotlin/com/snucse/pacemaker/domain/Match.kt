@@ -12,7 +12,7 @@ data class Match(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null,
 
-        var distance: Long
+        var distance: Long? = null,
         var matchStartDatetime: LocalDateTime? = null,
         var matchEndDatetime: LocalDateTime? = null
 )
@@ -34,10 +34,10 @@ data class UserMatch(
 
         @OneToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "userHistory_id")
-        var userHistory: UserHistory,
+        var userHistory: UserHistory? = null,
 
-        var distance: Long,
-        var speed: Long,
+        var distance: Long? = null,
+        var speed: Long? = null,
 
         var left100: Boolean = false,
         var left50: Boolean = false,

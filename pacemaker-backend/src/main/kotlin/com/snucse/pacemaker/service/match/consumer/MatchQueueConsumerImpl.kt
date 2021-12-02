@@ -6,10 +6,12 @@ import com.snucse.pacemaker.repository.MatchRepository
 import com.snucse.pacemaker.repository.UserMatchRepository
 import com.snucse.pacemaker.repository.UserRepository
 import com.snucse.pacemaker.service.match.queue.RedisMatchQueue
+import org.apache.tomcat.jni.Local
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.lang.Exception
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.transaction.Transactional
 
 @Service
@@ -70,8 +72,12 @@ class MatchQueueConsumerImpl(
             val user1 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
             val user2 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
 
+            var now = LocalDateTime.now().plusSeconds(5)
+            var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            var text = formatter.format(now)
+
             val match = Match(
-                    matchStartDatetime = LocalDateTime.now()
+                    matchStartDatetime = LocalDateTime.parse(text, formatter)
             )
 
             val savedMatch = matchRepository.save(match)
@@ -99,8 +105,12 @@ class MatchQueueConsumerImpl(
             val user2 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
             val user3 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
 
+            var now = LocalDateTime.now().plusSeconds(5)
+            var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            var text = formatter.format(now)
+
             val match = Match(
-                    matchStartDatetime = LocalDateTime.now()
+                    matchStartDatetime = LocalDateTime.parse(text, formatter)
             )
 
             val savedMatch = matchRepository.save(match)
@@ -135,8 +145,12 @@ class MatchQueueConsumerImpl(
             val user3 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
             val user4 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
 
+            var now = LocalDateTime.now().plusSeconds(5)
+            var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            var text = formatter.format(now)
+
             val match = Match(
-                    matchStartDatetime = LocalDateTime.now()
+                    matchStartDatetime = LocalDateTime.parse(text, formatter)
             )
 
             val savedMatch = matchRepository.save(match)
