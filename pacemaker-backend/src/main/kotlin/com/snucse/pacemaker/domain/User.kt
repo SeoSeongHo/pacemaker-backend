@@ -2,9 +2,6 @@ package com.snucse.pacemaker.domain
 
 import com.snucse.pacemaker.dto.UserDto
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter;
 import javax.persistence.*
 
 @Entity

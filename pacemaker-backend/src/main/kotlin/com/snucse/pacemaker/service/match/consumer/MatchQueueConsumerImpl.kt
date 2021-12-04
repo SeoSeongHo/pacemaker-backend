@@ -8,10 +8,8 @@ import com.snucse.pacemaker.repository.MatchRepository
 import com.snucse.pacemaker.repository.UserMatchRepository
 import com.snucse.pacemaker.repository.UserRepository
 import com.snucse.pacemaker.service.match.queue.RedisMatchQueue
-import org.apache.tomcat.jni.Local
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.lang.Exception
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -54,14 +52,15 @@ class MatchQueueConsumerImpl(
                 }
             }
 
-            val now = LocalDateTime.now().plusSeconds(15)
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val dateFrom = formatter.format(now)
+//            val now = LocalDateTime.now()
+//            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+//            val dateFrom = formatter.format(now.plusSeconds(15))
 
             val match = Match(
-                    matchStartDatetime = LocalDateTime.parse(dateFrom, formatter),
+                    matchStartDatetime = LocalDateTime.parse(LocalDateTime.now().plusSeconds(15).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
                     matchStatus = MatchStatus.MATCHING_COMPLETE
             )
+
             val savedMatch = matchRepository.save(match)
 
             for(user in users){
@@ -81,7 +80,6 @@ class MatchQueueConsumerImpl(
 
         timer.schedule(object: TimerTask(){
             override fun run(){
-                //println("$timerCnt")
                 consumeMatchFromQueue()
                 timerCnt++
                 if(timerCnt > 60*20){
@@ -90,121 +88,4 @@ class MatchQueueConsumerImpl(
             }
         }, 1000, 1000)
     }
-
-//    fun poll_2(category: String) {
-//        if (RedisMatchQueue.matchQueues[category] != null
-//                && RedisMatchQueue.matchQueues[category]!!.size >= 2) {
-//
-//            val user1 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//            val user2 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//
-//            var now = LocalDateTime.now().plusSeconds(5)
-//            var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//            var text = formatter.format(now)
-//
-//            val match = Match(
-//                    matchStartDatetime = LocalDateTime.parse(text, formatter)
-//            )
-//
-//            val savedMatch = matchRepository.save(match)
-//
-//            val userMatch1 = UserMatch(
-//                    user = user1,
-//                    match = savedMatch
-//            )
-//
-//            val userMatch2 = UserMatch(
-//                    user = user2,
-//                    match = savedMatch
-//            )
-//
-//            userMatchRepository.save(userMatch1)
-//            userMatchRepository.save(userMatch2)
-//        }
-//    }
-
-//    fun poll_3(category: String) {
-//        if (RedisMatchQueue.matchQueues[category] != null
-//                && RedisMatchQueue.matchQueues[category]!!.size >= 3) {
-//
-//            val user1 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//            val user2 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//            val user3 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//
-//            var now = LocalDateTime.now().plusSeconds(5)
-//            var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//            var text = formatter.format(now)
-//
-//            val match = Match(
-//                    matchStartDatetime = LocalDateTime.parse(text, formatter)
-//            )
-//
-//            val savedMatch = matchRepository.save(match)
-//
-//            val userMatch1 = UserMatch(
-//                    user = user1,
-//                    match = savedMatch
-//            )
-//
-//            val userMatch2 = UserMatch(
-//                    user = user2,
-//                    match = savedMatch
-//            )
-//
-//            val userMatch3 = UserMatch(
-//                    user = user3,
-//                    match = savedMatch
-//            )
-//
-//            userMatchRepository.save(userMatch1)
-//            userMatchRepository.save(userMatch2)
-//            userMatchRepository.save(userMatch3)
-//        }
-//    }
-//
-//    fun poll_4(category: String) {
-//        if (RedisMatchQueue.matchQueues[category] != null
-//                && RedisMatchQueue.matchQueues[category]!!.size >= 4) {
-//
-//            val user1 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//            val user2 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//            val user3 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//            val user4 = userRepository.findById(RedisMatchQueue.matchQueues[category]!!.poll()).orElseThrow()
-//
-//            var now = LocalDateTime.now().plusSeconds(5)
-//            var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//            var text = formatter.format(now)
-//
-//            val match = Match(
-//                    matchStartDatetime = LocalDateTime.parse(text, formatter)
-//            )
-//
-//            val savedMatch = matchRepository.save(match)
-//
-//            val userMatch1 = UserMatch(
-//                    user = user1,
-//                    match = savedMatch
-//            )
-//
-//            val userMatch2 = UserMatch(
-//                    user = user2,
-//                    match = savedMatch
-//            )
-//
-//            val userMatch3 = UserMatch(
-//                    user = user3,
-//                    match = savedMatch
-//            )
-//
-//            val userMatch4 = UserMatch(
-//                    user = user4,
-//                    match = savedMatch
-//            )
-//
-//            userMatchRepository.save(userMatch1)
-//            userMatchRepository.save(userMatch2)
-//            userMatchRepository.save(userMatch3)
-//            userMatchRepository.save(userMatch4)
-//        }
-//    }
 }

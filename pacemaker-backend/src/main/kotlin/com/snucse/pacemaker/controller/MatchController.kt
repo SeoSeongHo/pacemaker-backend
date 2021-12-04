@@ -1,7 +1,9 @@
 package com.snucse.pacemaker.controller
 
+import com.snucse.pacemaker.domain.MatchStatus
 import com.snucse.pacemaker.dto.AuthPrincipal
 import com.snucse.pacemaker.dto.MatchDto
+import com.snucse.pacemaker.dto.UserDto
 import com.snucse.pacemaker.service.match.MatchService
 import com.snucse.pacemaker.service.match.consumer.MatchQueueConsumer
 import com.snucse.pacemaker.service.match.queue.RedisMatchQueue
@@ -9,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("/api/v1/matches")
@@ -30,6 +34,8 @@ class MatchController(
 
         val matchRes = matchService.match(matchReq, authPrincipal.userId)
 
+        print("${matchRes.status}, ${matchRes.startDatetime}")
+
         return ResponseEntity
                     .ok()
                     .body(matchRes)
@@ -45,8 +51,29 @@ class MatchController(
     }
 
     @PostMapping("/cancel")
-    fun cancelMatch(@AuthenticationPrincipal authPrincipal: AuthPrincipal){
+    fun cancelMatch(@AuthenticationPrincipal authPrincipal: AuthPrincipal, @RequestBody matchReq: MatchDto.MatchReq): ResponseEntity<MatchDto.MatchRes>{
+        matchService.cancelMatch(matchReq, authPrincipal.userId)
 
+        val now = LocalDateTime.now().plusSeconds(15)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val dateFrom = formatter.format(now)
+
+        return ResponseEntity
+                .ok()
+                .body(MatchDto.MatchRes(
+                        status = MatchStatus.NONE,
+                        startDatetime = LocalDateTime.parse(dateFrom, formatter),
+                        users = mutableListOf()
+                ))
+    }
+
+    @GetMapping("/history/{id}")
+    fun getMatchHistory(@PathVariable id: Long): ResponseEntity<UserDto.UserHistory>{
+        val matchHistory = matchService.getUserMatchHistory(id)
+
+        return ResponseEntity
+                .ok()
+                .body(matchHistory)
     }
 
     @GetMapping

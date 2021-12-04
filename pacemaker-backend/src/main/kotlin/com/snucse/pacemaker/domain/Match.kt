@@ -1,14 +1,10 @@
 package com.snucse.pacemaker.domain
 
-import com.snucse.pacemaker.dto.MatchDto
 import com.snucse.pacemaker.dto.UserDto
 import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 import javax.persistence.*
-import kotlin.collections.ArrayList
 
 @Entity
 @Table(name = "match")
@@ -52,18 +48,18 @@ data class UserMatch(
         var finish: Boolean = false,
         var finishOther: Boolean = false,
 ) {
-        fun toDto(): UserDto.UserHistory {
+        fun toUserHistoryDto(): UserDto.UserHistory {
                 return UserDto.UserHistory(
                         id = id!!,
                         totalDistance = match.totalDistance,
 
-                        matchStartDatetime = match
+                        matchStartDatetime = LocalDateTime.parse(match
                                 .matchStartDatetime
-                                !!.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                                !!.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
 
-                        matchEndDatetime = match
+                        matchEndDatetime = LocalDateTime.parse(match
                                 .matchEndDatetime
-                                !!.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                                !!.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
 
                         totalTime = Duration.between(match.matchStartDatetime, match.matchEndDatetime).seconds,
 
@@ -87,5 +83,5 @@ data class UserMatch(
 }
 
 enum class MatchStatus{
-        MATCHING, MATCHING_COMPLETE, DONE, ERROR
+        MATCHING, MATCHING_COMPLETE, DONE, ERROR, NONE
 }

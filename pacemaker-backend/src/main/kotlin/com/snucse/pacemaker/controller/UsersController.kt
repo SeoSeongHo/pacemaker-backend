@@ -53,7 +53,7 @@ class UsersController (
     @PostMapping("/userHistory")
     fun userHistory(@AuthenticationPrincipal authPrincipal: AuthPrincipal): ResponseEntity<UserDto.UserHistoryRes> {
 
-        val userHistoryRes = userService.userHistory(authPrincipal.userId)
+        val userHistoryRes = userService.getUserHistory(authPrincipal.userId)
         return ResponseEntity
                 .ok()
                 .body(userHistoryRes)

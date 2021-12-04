@@ -75,14 +75,14 @@ class UserServiceImpl(
         return user.toDto()
     }
 
-    override fun userHistory(userId: Long): UserDto.UserHistoryRes {
+    override fun getUserHistory(userId: Long): UserDto.UserHistoryRes {
         val userMatch = userMatchRepository.findByUser_Id(userId)
 
-        var userHistoryRes = UserDto.UserHistoryRes()
+        val userHistoryRes = UserDto.UserHistoryRes()
 
         userMatch?.forEach {
             userHistoryRes.userHistoryList.add(
-                    it.toDto()
+                    it.toUserHistoryDto()
             )
         }
 

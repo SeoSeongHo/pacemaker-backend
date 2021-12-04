@@ -1,7 +1,5 @@
 package com.snucse.pacemaker.service.match.queue
 
-import com.snucse.pacemaker.domain.Match
-import com.snucse.pacemaker.domain.User
 import java.util.*
 
 class RedisMatchQueue {

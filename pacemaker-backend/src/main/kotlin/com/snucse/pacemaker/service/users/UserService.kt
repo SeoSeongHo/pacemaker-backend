@@ -13,7 +13,7 @@ interface UserService {
 
     fun updateNickname(updateNicknameRes: UserDto.updateNicknameRes, userId: Long): UserDto.UserRes
 
-    fun userHistory(userId: Long): UserDto.UserHistoryRes
+    fun getUserHistory(userId: Long): UserDto.UserHistoryRes
 
 //    fun isDuplicateEmail(email: String): Boolean
 }
