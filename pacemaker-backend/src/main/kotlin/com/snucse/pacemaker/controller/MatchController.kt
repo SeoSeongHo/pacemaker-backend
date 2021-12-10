@@ -56,15 +56,20 @@ class MatchController(
 
         val now = LocalDateTime.now().plusSeconds(15)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val dateFrom = formatter.format(now)
+        val dateForm = formatter.format(now)
 
         return ResponseEntity
                 .ok()
                 .body(MatchDto.MatchRes(
                         status = MatchStatus.NONE,
-                        startDatetime = LocalDateTime.parse(dateFrom, formatter),
+                        startDatetime = LocalDateTime.parse(dateForm, formatter),
                         users = mutableListOf()
                 ))
+    }
+
+    @GetMapping("/cancel/{id}")
+    fun cancelInMatch(@AuthenticationPrincipal authPrincipal: AuthPrincipal, @PathVariable id: Long){
+
     }
 
     @GetMapping("/history/{id}")

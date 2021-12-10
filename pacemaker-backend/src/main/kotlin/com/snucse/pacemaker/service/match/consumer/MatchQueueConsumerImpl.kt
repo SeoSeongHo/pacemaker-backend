@@ -28,18 +28,17 @@ class MatchQueueConsumerImpl(
 
     fun consumeMatchFromQueue(){
 
-        var category = ""
-
         for(participantNumber in participantNumbers){
             for(distance in distances){
-                category = "${distance}_${participantNumber}"
-                poll(category, participantNumber)
+                poll(distance, participantNumber)
             }
         }
 
     }
 
-    fun poll(category: String, participantsNumber: Long){
+    fun poll(distance: Long, participantsNumber: Long){
+
+        val category = "${distance}_${participantsNumber}"
 
         if (RedisMatchQueue.matchQueues[category] != null && RedisMatchQueue.matchQueues[category]!!.size >= participantsNumber)
         {
@@ -52,9 +51,15 @@ class MatchQueueConsumerImpl(
                 }
             }
 
+            val now = LocalDateTime.now().plusSeconds(15)
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            val dateForm = formatter.format(now)
+
             val match = Match(
-                    matchStartDatetime = LocalDateTime.parse(LocalDateTime.now().plusSeconds(15).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
-                    matchStatus = MatchStatus.MATCHING_COMPLETE
+                    matchStartDatetime = LocalDateTime.parse(dateForm, formatter),
+                    matchStatus = MatchStatus.MATCHING_COMPLETE,
+                    totalMembers = participantsNumber,
+                    totalDistance = distance
             )
 
             val savedMatch = matchRepository.save(match)

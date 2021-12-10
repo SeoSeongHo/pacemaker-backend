@@ -22,8 +22,9 @@ class MatchDto {
     
     data class InMatchReq(
             val userMatchId: Long,
-            val currentDistance: Long,
-            val currentSpeed: Long
+            val currentDistance: Double,
+            val currentSpeed: Double,
+            val count: Int
     )
 
     data class InMatchRes(
@@ -36,7 +37,7 @@ class MatchDto {
             val userMatchId: Long,
             val email: String,
             val nickname: String,
-            val currentDistance: Long? = 0,
-            val currentSpeed: Long? = 0
+            val currentDistance: Double? = 0.0,
+            val currentSpeed: Double? = 0.0
     )
 }

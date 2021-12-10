@@ -74,10 +74,10 @@ class UserDto {
             var matchEndDatetime: LocalDateTime,
             var totalTime: Long,
 
-            var rank: Long,
+            var rank: Int,
             var totalMembers: Long,
 
-            var maximumSpeed: Long,
-            var graph: List<Long>
+            var maximumSpeed: Double,
+            var graph: List<Double>
     )
 }
