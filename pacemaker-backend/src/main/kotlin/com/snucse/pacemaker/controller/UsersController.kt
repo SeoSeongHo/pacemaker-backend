@@ -50,7 +50,7 @@ class UsersController (
                 .body(updatedUser)
     }
 
-    @PostMapping("/userHistory")
+    @GetMapping("/userHistory")
     fun userHistory(@AuthenticationPrincipal authPrincipal: AuthPrincipal): ResponseEntity<UserDto.UserHistoryRes> {
 
         val userHistoryRes = userService.getUserHistory(authPrincipal.userId)

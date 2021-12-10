@@ -49,17 +49,18 @@ data class UserMatch(
         var finishOther: Boolean = false,
 ) {
         fun toUserHistoryDto(): UserDto.UserHistory {
+
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                val matchStartDatetime = formatter.format(match.matchStartDatetime!!)
+                val matchEndDatetime = formatter.format(match.matchEndDatetime!!)
+
                 return UserDto.UserHistory(
                         id = id!!,
                         totalDistance = match.totalDistance,
 
-                        matchStartDatetime = LocalDateTime.parse(match
-                                .matchStartDatetime
-                                !!.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
+                        matchStartDatetime = LocalDateTime.parse(match.matchStartDatetime!!.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
 
-                        matchEndDatetime = LocalDateTime.parse(match
-                                .matchEndDatetime
-                                !!.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
+                        matchEndDatetime = LocalDateTime.parse(match.matchEndDatetime!!.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
 
                         totalTime = Duration.between(match.matchStartDatetime, match.matchEndDatetime).seconds,
 

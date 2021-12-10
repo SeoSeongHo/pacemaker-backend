@@ -52,10 +52,6 @@ class MatchQueueConsumerImpl(
                 }
             }
 
-//            val now = LocalDateTime.now()
-//            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//            val dateFrom = formatter.format(now.plusSeconds(15))
-
             val match = Match(
                     matchStartDatetime = LocalDateTime.parse(LocalDateTime.now().plusSeconds(15).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
                     matchStatus = MatchStatus.MATCHING_COMPLETE

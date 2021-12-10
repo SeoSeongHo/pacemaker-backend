@@ -94,10 +94,6 @@ class MatchServiceImpl(
             }
         }
 
-//        val now = LocalDateTime.now().plusSeconds(15)
-//        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//        val dateFrom = formatter.format(now)
-
         return MatchDto.MatchRes(
                 status = MatchStatus.MATCHING,
                 startDatetime = LocalDateTime.parse(LocalDateTime.now().plusSeconds(15).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
