@@ -5,6 +5,7 @@ import com.snucse.pacemaker.domain.User
 import com.snucse.pacemaker.domain.UserMatch
 import com.snucse.pacemaker.dto.MatchDto
 import com.snucse.pacemaker.dto.UserDto
+import com.snucse.pacemaker.exception.MatchNotFoundException
 import com.snucse.pacemaker.exception.UserMatchNotExistException
 import com.snucse.pacemaker.repository.MatchRepository
 import com.snucse.pacemaker.repository.UserMatchRepository
@@ -22,9 +23,10 @@ class MatchServiceImpl(
         @Autowired private val matchRepository: MatchRepository
 ): MatchService {
 
-    override fun cancelInMatch(matchId: Long){
+    override fun cancelInMatch(userMatchId: Long){
 
-        val match = matchRepository.findById(matchId).orElseThrow()
+        val userMatch = userMatchRepository.findById(userMatchId).orElseThrow()
+        val match = userMatch.match
         match.matchStatus = MatchStatus.NONE
         matchRepository.save(match)
     }
@@ -73,7 +75,7 @@ class MatchServiceImpl(
                 val match = lastUserMatch.match
 
                 // If last match's start datetime is before the (now - 1 minute)
-                if(match.matchStartDatetime!!.isBefore(LocalDateTime.now().plusHours(9).minusMinutes(1))){
+                if(match.matchStartDatetime!!.isBefore(LocalDateTime.now().minusMinutes(1))){
                     // If exists data in queue, should skip
                     if(RedisMatchQueue.isExistUser(category, userId)){
                         // skip
@@ -193,7 +195,7 @@ class MatchServiceImpl(
 //        }
 
         // If match is processing, return response with MatchStatus.MATCHING
-        val now = LocalDateTime.now().plusHours(9).plusSeconds(15)
+        val now = LocalDateTime.now().plusSeconds(15)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateForm = formatter.format(now)
 
@@ -211,6 +213,13 @@ class MatchServiceImpl(
 
         val userMatch = getUserMatchByUserMatchId(inMatchReq.userMatchId)
         val match = userMatch.match
+
+        if(match.matchStatus != MatchStatus.MATCHING && match.matchStatus != MatchStatus.MATCHING_COMPLETE){
+            return MatchDto.InMatchRes(
+                    matchUsers = mutableListOf(),
+                    alarmCategory = "CANCEL"
+            )
+        }
 
         if(match.totalDistance!!.toDouble() >= userMatch.currentDistance)
         {
@@ -234,91 +243,35 @@ class MatchServiceImpl(
                 alarmCategory = "NONE"
         )
 
-        userMatch.match.id?.let { userMatchRepository.findAllByMatch_Id(it).forEach { otherUserMatch ->
+        val matchUsers = userMatchRepository.findAllByMatch_Id(match.id!!)
+        val mainMatchUsers = matchUsers.filter { matchUser -> matchUser.id == userMatch.id }.toMutableList()
+        val orderedMatchUsers = matchUsers.filter { matchUser -> matchUser.id != userMatch.id }.toMutableList()
+        orderedMatchUsers.add(0, mainMatchUsers[0])
+
+        orderedMatchUsers.map { orderedMatchUser ->
             inMatchRes.matchUsers.add(MatchDto.MatchUser(
-                    id = otherUserMatch.user.id!!,
-                    email =  otherUserMatch.user.email,
-                    nickname = otherUserMatch.user.nickname,
-                    currentDistance = otherUserMatch.currentDistance,
-                    currentSpeed = otherUserMatch.currentSpeed,
-                    userMatchId = otherUserMatch.id!!
+                    id = orderedMatchUser.user.id!!,
+                    email =  orderedMatchUser.user.email,
+                    nickname = orderedMatchUser.user.nickname,
+                    currentDistance = orderedMatchUser.currentDistance,
+                    currentSpeed = orderedMatchUser.currentSpeed,
+                    userMatchId = orderedMatchUser.id!!
             ))
-        } }
+        }
 
-//        // Finish Other
-//        var finishOther = false
+//        userMatch.match.id?.let { userMatchRepository.findAllByMatch_Id(it).forEach { otherUserMatch ->
 //
-//        otherUserMatches.forEach{ otherUserMatch ->
-//            if(otherUserMatch.finish){
-//                finishOther = true
-//            }
-//        }
+//            inMatchRes.matchUsers.add(MatchDto.MatchUser(
+//                    id = otherUserMatch.user.id!!,
+//                    email =  otherUserMatch.user.email,
+//                    nickname = otherUserMatch.user.nickname,
+//                    currentDistance = otherUserMatch.currentDistance,
+//                    currentSpeed = otherUserMatch.currentSpeed,
+//                    userMatchId = otherUserMatch.id!!
+//            ))
+//        } }
 
-//        if(finishOther && !userMatch.finishOther){
-//            userMatch.finishOther = true
-//            inMatchRes.alarmCategory = "FINISH_OTHER"
-//
-//            userMatchRepository.save(userMatch)
-//            return inMatchRes
-//        }
-
-        // First Order
-        //
-
-
-//        if(userMatch.match.totalDistance!!.toDouble() - inMatchReq.currentDistance <= 0 && !userMatch.finish){
-//            userMatch.finish = true
-//            inMatchRes.alarmCategory = "FINISH"
-//
-//            var firstOrder = true
-//
-//            val match = userMatch.match
-//            val findUserMatches = userMatchRepository.findAllByMatch_Id(match.id!!)
-//
-//            findUserMatches.forEach{
-//                findUserMatch -> if(findUserMatch.finish) firstOrder = false
-//            }
-//
-//            if(firstOrder){
-//                inMatchRes.alarmCategory = "FIRST_PLACE"
-//                findUserMatches.map { findUserMatch -> if(findUserMatch.id != userMatch.id) findUserMatch.finishOther = true}
-//            }
-//            else{
-//                inMatchRes.alarmCategory = "FINISH_OTHER"
-//                userMatch.finishOther = false
-//            }
-//        }
-//
-//        if(userMatch.finishOther){
-//            userMatch.finishOther = false
-//            inMatchRes.alarmCategory = "FINISH_OTHER"
-//        }
-
-
-        // Overtaken, Overtaking
-//        val userGraph = userMatch.getGraph()
-//        if(userGraph.size >= 10){
-//            userMatch.id?.let { userMatchRepository.findAllByMatch_Id(it).forEach { otherUserMatch ->
-//                val otherUserGraph = otherUserMatch.getGraph()
-//                if(otherUserMatch.id != userMatch.id && otherUserGraph.size >= 10){
-//                    val userGraphSize = userGraph.size
-//                    val otherUserGraphSize = otherUserGraph.size
-//
-//                    if(userGraph[userGraphSize-2] < otherUserGraph[otherUserGraphSize-2]){
-//                        if(userGraph[userGraphSize-1] > otherUserGraph[otherUserGraphSize-1]){
-//                            inMatchRes.alarmCategory = "OVERTAKING"
-//                        }
-//                    }
-//                    else if(userGraph[userGraphSize-2] > otherUserGraph[otherUserGraphSize-2]){
-//                        if(userGraph[userGraphSize-1] < otherUserGraph[otherUserGraphSize-1]){
-//                            inMatchRes.alarmCategory = "OVERTAKEN"
-//                        }
-//                    }
-//                }
-//            } }
-//        }
-
-        val now = LocalDateTime.now().plusHours(9)
+        val now = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateForm = formatter.format(now)
 
