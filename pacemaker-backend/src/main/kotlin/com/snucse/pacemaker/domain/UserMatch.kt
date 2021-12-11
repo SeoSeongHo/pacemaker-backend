@@ -8,7 +8,6 @@ import javax.persistence.*
 import javax.validation.constraints.Size
 
 @Entity
-@Table(name = "user_matches")
 data class UserMatch(
 
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +24,7 @@ data class UserMatch(
         var currentDistance: Double = 0.0,
         var currentSpeed: Double = 0.0,
 
+        @Column(name = "match_rank")
         var rank: Int = 0,
         var maximumSpeed: Double = 0.0,
 
