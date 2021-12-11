@@ -49,4 +49,20 @@ class UsersController (
                 .ok()
                 .body(updatedUser)
     }
+
+    @GetMapping("/userHistory")
+    fun userHistory(@AuthenticationPrincipal authPrincipal: AuthPrincipal): ResponseEntity<UserDto.UserHistoryRes> {
+
+        val userHistoryRes = userService.getUserHistory(authPrincipal.userId)
+        return ResponseEntity
+                .ok()
+                .body(userHistoryRes)
+    }
+
+    @GetMapping("/test")
+    fun test(): ResponseEntity<String> {
+        return ResponseEntity
+                .ok()
+                .body("sucess")
+    }
 }

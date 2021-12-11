@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import com.snucse.pacemaker.exception.*
 import com.snucse.pacemaker.repository.BlackListRepository
+import com.snucse.pacemaker.repository.UserMatchRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,7 +20,8 @@ class UserServiceImpl(
         @Autowired private val userRepository: UserRepository,
         @Autowired private val bCryptPasswordEncoder: BCryptPasswordEncoder,
         @Autowired private val jwtTokenProvider: JwtTokenProvider,
-        @Autowired private val blackListRepository: BlackListRepository
+        @Autowired private val blackListRepository: BlackListRepository,
+        @Autowired private val userMatchRepository: UserMatchRepository
 ): UserService {
     override fun getUserById(id: Long): User =
             userRepository.findById(id).orElseThrow { throw UserNotFoundException("can't find user by id: $id.")}
@@ -33,7 +35,7 @@ class UserServiceImpl(
         if(userRepository.existsByEmail(signUpReq.email))
             throw DuplicateEmailException("duplicate email: ${signUpReq.email}")
 
-        if(userRepository.existsByUserInfoNickname(signUpReq.nickname))
+        if(userRepository.existsByNickname(signUpReq.nickname))
             throw DuplicateNicknameException("duplicate nickname: ${signUpReq.nickname}")
 
         val createdUser = userRepository.save(signUpReq.toEntity(bCryptPasswordEncoder))
@@ -71,6 +73,20 @@ class UserServiceImpl(
         }
 
         return user.toDto()
+    }
+
+    override fun getUserHistory(userId: Long): UserDto.UserHistoryRes {
+        val userMatch = userMatchRepository.findByUser_Id(userId)
+
+        val userHistoryRes = UserDto.UserHistoryRes()
+
+        userMatch?.forEach {
+            userHistoryRes.userHistoryList.add(
+                    it.toUserHistoryDto()
+            )
+        }
+
+        return userHistoryRes
     }
 
 

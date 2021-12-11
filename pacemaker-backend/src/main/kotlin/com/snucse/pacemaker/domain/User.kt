@@ -35,9 +35,3 @@ data class User (
                 )
         }
 }
-
-//@Embeddable
-//data class UserInfo(
-//        @Column(name = "nickname", unique = true, length = 20)
-//        var nickname: String
-//)

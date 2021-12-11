@@ -27,6 +27,8 @@ class JwtTokenFilter(
                 }
             }
             chain?.doFilter(request, response)
+
+            val test = 0
         }
         catch (authenticationException: AuthenticationException){
             SecurityContextHolder.clearContext()

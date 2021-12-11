@@ -2,6 +2,7 @@ package com.snucse.pacemaker.dto
 
 import com.snucse.pacemaker.domain.User
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import java.time.LocalDateTime
 
 class UserDto {
     data class SignInReq(
@@ -62,5 +63,21 @@ class UserDto {
     )
 
 
+    data class UserHistoryRes(
+            var userHistoryList: ArrayList<UserHistory> = arrayListOf<UserHistory>()
+    )
 
+    data class UserHistory(
+            var id: Long,
+            var totalDistance: Long,
+            var matchStartDatetime: LocalDateTime,
+            var matchEndDatetime: LocalDateTime,
+            var totalTime: Long,
+
+            var rank: Int,
+            var totalMembers: Long,
+
+            var maximumSpeed: Double,
+            var graph: List<Double>
+    )
 }
