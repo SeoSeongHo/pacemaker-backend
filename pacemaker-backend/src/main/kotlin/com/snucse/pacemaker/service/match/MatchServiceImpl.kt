@@ -22,7 +22,15 @@ class MatchServiceImpl(
         @Autowired private val matchRepository: MatchRepository
 ): MatchService {
 
+    override fun cancelInMatch(matchId: Long){
+
+        val match = matchRepository.findById(matchId).orElseThrow()
+        match.matchStatus = MatchStatus.NONE
+        matchRepository.save(match)
+    }
+
     override fun getUserMatchHistory(userMatchId: Long): UserDto.UserHistory{
+
         val userMatch = userMatchRepository.getById(userMatchId)
         return userMatch.toUserHistoryDto()
     }
@@ -65,7 +73,7 @@ class MatchServiceImpl(
                 val match = lastUserMatch.match
 
                 // If last match's start datetime is before the (now - 1 minute)
-                if(match.matchStartDatetime!!.isBefore(LocalDateTime.now().minusMinutes(1))){
+                if(match.matchStartDatetime!!.isBefore(LocalDateTime.now().plusHours(9).minusMinutes(1))){
                     // If exists data in queue, should skip
                     if(RedisMatchQueue.isExistUser(category, userId)){
                         // skip
@@ -100,10 +108,14 @@ class MatchServiceImpl(
                             }
                         }
 
-                        val mainMatchUser = matchUsers.filter { matchUser -> matchUser.id == userId }
+                        val mainMatchUsers = matchUsers.filter { matchUser -> matchUser.id == userId }.toMutableList()
                         matchUsers = matchUsers.filter { matchUser -> matchUser.id != userId }.toMutableList()
-                        matchUsers.sortBy { matchUser -> matchUser.id }
-                        matchUsers.add(0, mainMatchUser[0])
+                        matchUsers.add(0, mainMatchUsers[0])
+
+//                        val mainMatchUser = matchUsers.filter { matchUser -> matchUser.id == userId }
+//                        matchUsers = matchUsers.filter { matchUser -> matchUser.id != userId }.toMutableList()
+//                        matchUsers.sortBy { matchUser -> matchUser.id }
+//                        matchUsers.add(0, mainMatchUser[0])
 
                         return MatchDto.MatchRes(
                                 status = MatchStatus.MATCHING_COMPLETE,
@@ -181,7 +193,7 @@ class MatchServiceImpl(
 //        }
 
         // If match is processing, return response with MatchStatus.MATCHING
-        val now = LocalDateTime.now().plusSeconds(15)
+        val now = LocalDateTime.now().plusHours(9).plusSeconds(15)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateForm = formatter.format(now)
 
@@ -306,7 +318,7 @@ class MatchServiceImpl(
 //            } }
 //        }
 
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now().plusHours(9)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateForm = formatter.format(now)
 

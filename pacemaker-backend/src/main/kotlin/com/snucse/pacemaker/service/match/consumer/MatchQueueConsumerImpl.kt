@@ -33,7 +33,6 @@ class MatchQueueConsumerImpl(
                 poll(distance, participantNumber)
             }
         }
-
     }
 
     fun poll(distance: Long, participantsNumber: Long){
@@ -51,7 +50,7 @@ class MatchQueueConsumerImpl(
                 }
             }
 
-            val now = LocalDateTime.now().plusSeconds(15)
+            val now = LocalDateTime.now().plusHours(9).plusSeconds(15)
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val dateForm = formatter.format(now)
 
@@ -82,10 +81,10 @@ class MatchQueueConsumerImpl(
         timer.schedule(object: TimerTask(){
             override fun run(){
                 consumeMatchFromQueue()
-                timerCnt++
-                if(timerCnt > 60*20){
-                    timer.cancel()
-                }
+//                timerCnt++
+//                if(timerCnt > 60*20){
+//                    timer.cancel()
+//                }
             }
         }, 1000, 1000)
     }

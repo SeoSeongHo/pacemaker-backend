@@ -13,4 +13,5 @@ interface MatchService {
     fun getUserMatchByUserMatchId(userMatchId: Long): UserMatch
     fun inMatchPolling(inMatchReq: MatchDto.InMatchReq): MatchDto.InMatchRes
     fun getUserMatchHistory(userMatchId: Long): UserDto.UserHistory
+    fun cancelInMatch(matchId: Long)
 }
