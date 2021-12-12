@@ -54,7 +54,7 @@ class MatchController(
     fun cancelMatch(@AuthenticationPrincipal authPrincipal: AuthPrincipal, @RequestBody matchReq: MatchDto.MatchReq): ResponseEntity<MatchDto.MatchRes>{
         matchService.cancelMatch(matchReq, authPrincipal.userId)
 
-        val now = LocalDateTime.now().plusSeconds(15)
+        val now = LocalDateTime.now().plusHours(9).plusSeconds(15)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateForm = formatter.format(now)
 
