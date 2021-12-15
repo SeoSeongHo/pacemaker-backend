@@ -2,6 +2,7 @@ package com.snucse.pacemaker.service.users
 
 import com.snucse.pacemaker.config.jwt.JwtTokenProvider
 import com.snucse.pacemaker.domain.BlackList
+import com.snucse.pacemaker.domain.MatchStatus
 import com.snucse.pacemaker.domain.User
 import com.snucse.pacemaker.dto.OAuthDto
 import com.snucse.pacemaker.dto.UserDto
@@ -76,11 +77,17 @@ class UserServiceImpl(
     }
 
     override fun getUserHistory(userId: Long): UserDto.UserHistoryRes {
-        val userMatch = userMatchRepository.findByUser_Id(userId)
+        val userMatches = userMatchRepository.findByUser_Id(userId)!!.filter { userMatch -> userMatch.match.matchStatus == MatchStatus.DONE}
 
         val userHistoryRes = UserDto.UserHistoryRes()
 
-        userMatch?.forEach {
+        if(userMatches.count() < 1){
+            return userHistoryRes
+        }
+
+        val reversedUserMatches = userMatches.reversed()
+
+        reversedUserMatches.forEach {
             userHistoryRes.userHistoryList.add(
                     it.toUserHistoryDto()
             )
