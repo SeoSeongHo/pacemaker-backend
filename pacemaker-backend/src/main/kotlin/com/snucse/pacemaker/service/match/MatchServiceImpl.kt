@@ -118,11 +118,6 @@ class MatchServiceImpl(
                         matchUsers = matchUsers.filter { matchUser -> matchUser.id != userId }.toMutableList()
                         matchUsers.add(0, mainMatchUsers[0])
 
-//                        val mainMatchUser = matchUsers.filter { matchUser -> matchUser.id == userId }
-//                        matchUsers = matchUsers.filter { matchUser -> matchUser.id != userId }.toMutableList()
-//                        matchUsers.sortBy { matchUser -> matchUser.id }
-//                        matchUsers.add(0, mainMatchUser[0])
-
                         return MatchDto.MatchRes(
                                 status = MatchStatus.MATCHING_COMPLETE,
                                 startDatetime = match.matchStartDatetime!!,
@@ -145,58 +140,6 @@ class MatchServiceImpl(
                     RedisMatchQueue.add(category, userId)
             }
         }
-
-//        // If it already exists in the match queue
-//        if(RedisMatchQueue.isExistUser(category, userId)){
-//
-//            // If it exists in the match DB
-//            if(userMatchRepository.existsByUser_Id(userId)){
-//                val userMatches = userMatchRepository.findByUser_Id(userId)
-//                // find last user match
-//                val filteredUserMatches = userMatches!!.filter { userMatch ->  userMatch.match.matchStatus == MatchStatus.MATCHING_COMPLETE}
-//                filteredUserMatches.sortedByDescending { userMatch ->  userMatch.match.matchEndDatetime }
-//                val match = filteredUserMatches[0].match
-//
-//                val realUserMatches = userMatchRepository.findAllByMatch_Id(match.id!!)
-//                var filteredRealUserMatches = realUserMatches
-//
-//                if(realUserMatches.isNotEmpty()){
-//                    filteredRealUserMatches = realUserMatches.filter { realUserMatch -> realUserMatch.match.matchStatus == MatchStatus.MATCHING_COMPLETE }
-//                }
-//
-//                val users = mutableListOf<User>()
-//                var matchUsers = mutableListOf<MatchDto.MatchUser>()
-//                if(filteredRealUserMatches.isNotEmpty()){
-//                    filteredRealUserMatches.forEach { userMatch ->
-//                        matchUsers.add(MatchDto.MatchUser(
-//                                id = userMatch.user.id!!,
-//                                userMatchId = userMatch.id!!,
-//                                email = userMatch.user.email,
-//                                nickname = userMatch.user.nickname,
-//                                currentDistance = userMatch.currentDistance,
-//                                currentSpeed = userMatch.currentSpeed
-//                        ))
-//                        users.add(userMatch.user)
-//                    }
-//                }
-//
-//                val mainMatchUser = matchUsers.filter { matchUser -> matchUser.id == userId }
-//                matchUsers = matchUsers.filter { matchUser -> matchUser.id != userId }.toMutableList()
-//                matchUsers.sortBy { matchUser -> matchUser.id }
-//                matchUsers.add(0, mainMatchUser[0])
-//
-//                return MatchDto.MatchRes(
-//                        status = MatchStatus.MATCHING_COMPLETE,
-//                        startDatetime = match.matchStartDatetime!!,
-//                        users = matchUsers
-//                )
-//            }
-//        }
-//        else{
-//            if(!RedisMatchQueue.isExistUser(category, userId)){
-//                RedisMatchQueue.add(category, userId)
-//            }
-//        }
 
         // If match is processing, return response with MatchStatus.MATCHING
         val now = LocalDateTime.now().plusHours(9).plusSeconds(15)
@@ -284,18 +227,6 @@ class MatchServiceImpl(
             ))
         }
 
-//        userMatch.match.id?.let { userMatchRepository.findAllByMatch_Id(it).forEach { otherUserMatch ->
-//
-//            inMatchRes.matchUsers.add(MatchDto.MatchUser(
-//                    id = otherUserMatch.user.id!!,
-//                    email =  otherUserMatch.user.email,
-//                    nickname = otherUserMatch.user.nickname,
-//                    currentDistance = otherUserMatch.currentDistance,
-//                    currentSpeed = otherUserMatch.currentSpeed,
-//                    userMatchId = otherUserMatch.id!!
-//            ))
-//        } }
-
         val now = LocalDateTime.now().plusHours(9)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateForm = formatter.format(now)
@@ -351,20 +282,6 @@ class MatchServiceImpl(
 
             return inMatchRes
         }
-
-//        var done = true
-//        userMatch.id?.let { userMatchRepository.findAllByMatch_Id(it).forEach { otherUserMatch ->
-//            if(otherUserMatch.finish){
-//                done = false
-//            }
-//        }}
-//
-//        if(done){
-//            inMatchRes.alarmCategory = "DONE"
-//            val match = userMatch.match
-//            match.matchStatus = MatchStatus.DONE
-//            matchRepository.save(match)
-//        }
 
         return inMatchRes
     }
