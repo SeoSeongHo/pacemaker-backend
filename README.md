@@ -33,7 +33,7 @@ GPS-based Real-time Running mate matching application
 // Requires aws cli and docker
 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin {AWS ECR Endpoint}
 docker buildx build -t pacemaker-backend . --linux/amd64
-docker tag pacemaker-backend:latest {AWS ECR Endpoint}pacemaker-backend:latest
+docker tag pacemaker-backend:latest {AWS ECR Endpoint}/pacemaker-backend:latest
 docker push {AWS ECR Endpoint}/pacemaker-backend:{tag}
 ```
 
