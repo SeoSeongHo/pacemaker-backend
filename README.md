@@ -31,10 +31,10 @@ GPS-based Real-time Running mate matching application
 ### Docker image build and push (on Local)
 ```
 // Requires aws cli and docker
-aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 614318693450.dkr.ecr.ap-northeast-2.amazonaws.com
+aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin {AWS ECR Endpoint}
 docker buildx build -t pacemaker-backend . --linux/amd64
-docker tag pacemaker-backend:latest 614318693450.dkr.ecr.ap-northeast-2.amazonaws.com/pacemaker-backend:latest
-docker push 614318693450.dkr.ecr.ap-northeast-2.amazonaws.com/pacemaker-backend:latest
+docker tag pacemaker-backend:latest {AWS ECR Endpoint}pacemaker-backend:latest
+docker push {AWS ECR Endpoint}/pacemaker-backend:{tag}
 ```
 
 ---
@@ -43,8 +43,8 @@ docker push 614318693450.dkr.ecr.ap-northeast-2.amazonaws.com/pacemaker-backend:
 ```
 // Requires java version 11 or higher
 // Requires aws cli and docker
-aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 614318693450.dkr.ecr.ap-northeast-2.amazonaws.com
-docker pull 614318693450.dkr.ecr.ap-northeast-2.amazonaws.com/pacemaker-backend:latest
+aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin {AWS ECR Endpoint}
+docker pull {AWS ECR Endpoint}/pacemaker-backend:{tag}
 ```
 
 ---
